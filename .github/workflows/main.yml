@@ -16,13 +16,12 @@ env:
   BUILD_VERSION: 1.0.0
   PYTHON_VERSION: 3.12.2
   FLUTTER_VERSION: 3.22.2
-  OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
 
 jobs:
   build-linux:
     runs-on: ubuntu-latest
     env:
-      OPENROUTER_API_KEY: ${{ env.OPENROUTER_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
 
     steps:
     - name: Checkout code
@@ -67,7 +66,7 @@ jobs:
   build-macos:
     runs-on: macos-latest
     env:
-      OPENROUTER_API_KEY: ${{ env.OPENROUTER_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
 
     steps:
     - name: Checkout code
@@ -105,7 +104,7 @@ jobs:
   build-windows:
     runs-on: windows-latest
     env:
-      OPENROUTER_API_KEY: ${{ env.OPENROUTER_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
 
     steps:
     - name: Checkout code
@@ -143,7 +142,7 @@ jobs:
   build-aab:
     runs-on: macos-latest
     env:
-      OPENROUTER_API_KEY: ${{ env.OPENROUTER_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
 
     steps:
     - name: Checkout code
@@ -181,7 +180,7 @@ jobs:
   build-apk:
     runs-on: ubuntu-latest
     env:
-      OPENROUTER_API_KEY: ${{ env.OPENROUTER_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
 
     steps:
     - name: Checkout code
@@ -225,7 +224,7 @@ jobs:
   build-ipa:
     runs-on: macos-latest
     env:
-      OPENROUTER_API_KEY: ${{ env.OPENROUTER_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
 
     steps:
     - name: Checkout code
