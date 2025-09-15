@@ -18,7 +18,7 @@ env:
   FLUTTER_VERSION: 3.22.2
 
 jobs:
-  build-apk:
+   build-apk:
     runs-on: ubuntu-latest
 
     steps:
@@ -48,6 +48,11 @@ jobs:
 
     - name: Accept Android Licenses
       run: yes | flutter doctor --android-licenses
+
+    - name: Install Linux Deps (GTK & Tools)
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y libgtk-3-dev liblzma-dev cmake ninja-build pkg-config
 
     - name: Build APK with Flet
       run: |
