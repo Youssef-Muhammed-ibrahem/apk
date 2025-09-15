@@ -1,49 +1,64 @@
-name: Build Flet APK
+name: All Builds (Linux, macOS, Windows, Android, IPA, APK, AAB)
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - master
+      - main
   pull_request:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+env:
+  BUILD_NUMBER: 1
+  BUILD_VERSION: 1.0.0
+  PYTHON_VERSION: 3.12.2
+  FLUTTER_VERSION: 3.22.2
+  OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}   # ✅ متغير البيئة من GitHub Secrets
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
-
     steps:
-      # سحب الكود
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      # تثبيت بايثون
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+    - name: Setup Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
 
-      # تثبيت Flet + dependencies
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install flet
+    - name: Install Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      # تثبيت Java & Android SDK (مطلوب عشان apk)
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: "temurin"
-          java-version: "17"
+    - name: Setup Flutter ${{ env.FLUTTER_VERSION }}
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
 
-      - name: Install Android SDK
-        uses: android-actions/setup-android@v3
+    - name: Patch for linux build
+      run: |
+        flutter config --no-analytics
+        sudo apt-get update -y
+        sudo apt-get install -y ninja-build libgtk-3-dev
+        flutter doctor
 
-      # بناء APK باستخدام Flet
-      - name: Build APK
-        run: flet build apk
+    - name: Flet Build Linux
+      run: |
+        echo "Using OPENROUTER_API_KEY=$OPENROUTER_API_KEY"
+        flet build linux --verbose --build-number=$BUILD_NUMBER --build-version=$BUILD_VERSION
 
-      # حفظ الـ APK كـ Artifact
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: flet-apk
-          path: build/**/outputs/**/*.apk
+    - name: Upload Linux Artifact
+      uses: actions/upload-artifact@v4.3.4
+      with:
+        name: linux-build-artifact
+        path: build/linux
+        if-no-files-found: warn
+        overwrite: false
+
+  # باقي الـ jobs (macos, windows, apk, aab, ipa)
+  # هتشتغل عادي بنفس env فوق ومش محتاج تكرر المتغير
