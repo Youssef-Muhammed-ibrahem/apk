@@ -11,22 +11,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout الكود من المستودع
+      # Checkout الكود
       - uses: actions/checkout@v3
 
-      # 2️⃣ Setup Flutter (حدد نفس نسخة Flutter اللي بتشتغل بيها)
+      # Setup Flutter
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.2'
+          flutter-version: '3.29.2'   # نفس اللي ظاهر في اللوج
 
-      # 3️⃣ Setup Java JDK (مطلوب للـ Gradle)
+      # تثبيت Java JDK 17 (مطلوب عشان Gradle)
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # 4️⃣ Setup Android SDK
+      # تثبيت Android SDK
       - name: Install Android SDK
         uses: android-actions/setup-android@v3
         with:
@@ -34,23 +34,23 @@ jobs:
           build-tools: 34.0.0
           cmake: 3.22.1
 
-      # 5️⃣ Accept Android Licenses
+      # قبول تراخيص SDK
       - name: Accept Android Licenses
         run: yes | sdkmanager --licenses
 
-      # 6️⃣ Run Flutter Doctor للتأكد من البيئة
+      # Flutter Doctor (للتأكد)
       - name: Flutter Doctor
         run: flutter doctor -v
 
-      # 7️⃣ Install dependencies
+      # تثبيت Dependencies
       - name: Get Dependencies
         run: flutter pub get
 
-      # 8️⃣ Build APK (نسخة release)
+      # بناء APK
       - name: Build APK
         run: flutter build apk --release
 
-      # 9️⃣ رفع ملف الـ APK كـ Artifact عشان تقدر تنزله من GitHub
+      # حفظ الـ APK كـ Artifact
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
