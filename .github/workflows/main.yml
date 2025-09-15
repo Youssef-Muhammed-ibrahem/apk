@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      # 3. نثبت Flutter (قناة beta لدعم Dart 3.9)
+      # 3. نثبت Flutter
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -29,27 +29,35 @@ jobs:
           channel: beta
           cache: true
 
-      # 4. تثبيت الباكجات
+      # 4. نلغي الـ analytics عشان الرسالة متوقفش البيلد
+      - name: Disable Flutter analytics
+        run: flutter config --no-analytics
+
+      # 5. تثبيت الباكجات (جوه فولدر المشروع بتاعك)
       - name: Install dependencies
         run: flutter pub get
+        working-directory: ./اسم-الفولدر-بتاع-المشروع
 
-      # 5. تشغيل build للـ APK (نسخة release)
+      # 6. build APK
       - name: Build release APK
         run: flutter build apk --release
+        working-directory: ./اسم-الفولدر-بتاع-المشروع
 
-      # 6. (اختياري) تشغيل build للـ AAB
+      # 7. build AAB (اختياري)
       - name: Build App Bundle
         run: flutter build appbundle --release
+        working-directory: ./اسم-الفولدر-بتاع-المشروع
 
-      # 7. رفع الـ artifacts (الملفات الناتجة)
+      # 8. رفع الـ APK
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: ./اسم-الفولدر-بتاع-المشروع/build/app/outputs/flutter-apk/app-release.apk
 
+      # 9. رفع الـ AAB
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
           name: release-aab
-          path: build/app/outputs/bundle/release/app-release.aab
+          path: ./اسم-الفولدر-بتاع-المشروع/build/app/outputs/bundle/release/app-release.aab
