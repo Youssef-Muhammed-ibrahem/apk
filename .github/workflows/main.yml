@@ -1,63 +1,49 @@
-name: Flutter Build
+name: Build Flet APK
 
 on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. نسحب الكود من الريبو
+      # سحب الكود
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. نثبت Python 3.11
-      - name: Set up Python
+      # تثبيت بايثون
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      # 3. نثبت Flutter
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.31.0-0.1.pre'
-          channel: beta
-          cache: true
-
-      # 4. نلغي الـ analytics عشان الرسالة متوقفش البيلد
-      - name: Disable Flutter analytics
-        run: flutter config --no-analytics
-
-      # 5. تثبيت الباكجات (جوه فولدر المشروع بتاعك)
+      # تثبيت Flet + dependencies
       - name: Install dependencies
-        run: flutter pub get
-        working-directory: ./اسم-الفولدر-بتاع-المشروع
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flet
 
-      # 6. build APK
-      - name: Build release APK
-        run: flutter build apk --release
-        working-directory: ./اسم-الفولدر-بتاع-المشروع
+      # تثبيت Java & Android SDK (مطلوب عشان apk)
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
 
-      # 7. build AAB (اختياري)
-      - name: Build App Bundle
-        run: flutter build appbundle --release
-        working-directory: ./اسم-الفولدر-بتاع-المشروع
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
 
-      # 8. رفع الـ APK
-      - name: Upload APK artifact
+      # بناء APK باستخدام Flet
+      - name: Build APK
+        run: flet build apk
+
+      # حفظ الـ APK كـ Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
-          path: ./اسم-الفولدر-بتاع-المشروع/build/app/outputs/flutter-apk/app-release.apk
-
-      # 9. رفع الـ AAB
-      - name: Upload AAB artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-aab
-          path: ./اسم-الفولدر-بتاع-المشروع/build/app/outputs/bundle/release/app-release.aab
+          name: flet-apk
+          path: build/**/outputs/**/*.apk
