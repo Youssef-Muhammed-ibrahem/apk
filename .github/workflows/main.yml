@@ -1,4 +1,4 @@
-name: Build APK
+name: Flutter Build
 
 on:
   push:
@@ -11,29 +11,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      # 1. نسحب الكود من الريبو
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. نثبت Python 3.11
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      # 3. نثبت Flutter (قناة beta لدعم Dart 3.9)
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.31.0'   # أحدث إصدار ثابت بيدعم Dart 3.9
-          channel: stable
-          cache: true   # كاشي علشان السرعة
+          flutter-version: '3.31.0-0.1.pre'
+          channel: beta
+          cache: true
 
-      - name: Flutter pub get
+      # 4. تثبيت الباكجات
+      - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APK
+      # 5. تشغيل build للـ APK (نسخة release)
+      - name: Build release APK
         run: flutter build apk --release
 
-      - name: Upload APK
+      # 6. (اختياري) تشغيل build للـ AAB
+      - name: Build App Bundle
+        run: flutter build appbundle --release
+
+      # 7. رفع الـ artifacts (الملفات الناتجة)
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-aab
+          path: build/app/outputs/bundle/release/app-release.aab
